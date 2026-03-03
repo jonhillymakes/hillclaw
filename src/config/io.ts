@@ -52,6 +52,8 @@ import {
   validateConfigObjectWithPlugins,
 } from "./validation.js";
 import { compareOpenClawVersions } from "./version.js";
+import { emitHillclawError } from "../infra/hillclaw-error-handler.js";
+import { ErrorCodes, HillclawError } from "../infra/hillclaw-error.js";
 
 // Re-export for backwards compatibility
 export { CircularIncludeError, ConfigIncludeError } from "./includes.js";
@@ -530,8 +532,15 @@ async function appendConfigWriteAuditRecord(
       encoding: "utf-8",
       mode: 0o600,
     });
-  } catch {
+  } catch (err) {
     // best-effort
+    emitHillclawError(new HillclawError({
+      code: ErrorCodes.CONFIG_AUDIT_FAILED,
+      subsystem: "config",
+      severity: "low",
+      message: "Failed to write config audit log",
+      cause: err instanceof Error ? err : new Error(String(err)),
+    }));
   }
 }
 
@@ -1061,8 +1070,15 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
           changedPaths = new Set<string>();
           collectChangedPaths(snapshot.config, cfg, "", changedPaths);
         }
-      } catch {
+      } catch (err) {
         envRefMap = null;
+        emitHillclawError(new HillclawError({
+          code: ErrorCodes.CONFIG_ENV_REF_LOST,
+          subsystem: "config",
+          severity: "high",
+          message: "Failed to parse env-ref map; ${VAR} references may be lost on next write",
+          cause: err instanceof Error ? err : new Error(String(err)),
+        }));
       }
     }
 
@@ -1106,8 +1122,15 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
           ) as OpenClawConfig;
         }
       }
-    } catch {
+    } catch (err) {
       // If reading the current file fails, write cfg as-is (no env restoration)
+      emitHillclawError(new HillclawError({
+        code: ErrorCodes.CONFIG_ENV_REF_LOST,
+        subsystem: "config",
+        severity: "high",
+        message: "Failed to read config for env-var restoration; writing config as-is",
+        cause: err instanceof Error ? err : new Error(String(err)),
+      }));
     }
 
     const dir = path.dirname(configPath);

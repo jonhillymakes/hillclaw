@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd \\\"C:/Users/t4nk3/Documents/GitHub/hillclaw\\\" && pnpm test:hillclaw-unit 2>&1\",\"timeout\":120000,\"description\":\"Run hillclaw unit test suite after mock path fix\"}",
+  "error": "Exit code 1\n\n> openclaw@2026.3.2 test:hillclaw-unit C:\\Users\\t4nk3\\Documents\\GitHub\\hillclaw\n> vitest run --config vitest.hillclaw-unit.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv4.0.18 \u001b[39m\u001b[90mC:/Users/t4nk3/Documents/GitHub/hillclaw\u001b[39m\n\n\u001b[90mstderr\u001b[2m | src/hillclaw/test-suites/unit/gateway-stability.test.ts\u001b[2m > \u001b[22m\u001b[2mGateway Stability — Unit Suite (0.11a)\u001b[2m > \u001b[22m\u001b[2mBoot lifecycle\u001b[2m > \u001b[22m\u001b[2mchannel guard loads only Discord\n\u001b[22m\u001b[39m[hillclaw] enforceDiscordOnly: stripping ...",
+  "timestamp": "2026-03-02T20:36:56.322Z",
+  "retry_count": 1
+}

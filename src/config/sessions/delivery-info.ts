@@ -1,3 +1,5 @@
+import { emitHillclawError } from "../../infra/hillclaw-error-handler.js";
+import { ErrorCodes, HillclawError } from "../../infra/hillclaw-error.js";
 import { loadConfig } from "../io.js";
 import { resolveStorePath } from "./paths.js";
 import { loadSessionStore } from "./store.js";
@@ -50,8 +52,16 @@ export function extractDeliveryInfo(sessionKey: string | undefined): {
         accountId: entry.deliveryContext.accountId,
       };
     }
-  } catch {
+  } catch (err) {
     // ignore: best-effort
+    emitHillclawError(new HillclawError({
+      code: ErrorCodes.SESSION_DELIVERY_FAILED,
+      subsystem: "session",
+      severity: "medium",
+      message: "Failed to load delivery context from session store",
+      cause: err instanceof Error ? err : new Error(String(err)),
+      sessionKey,
+    }));
   }
   return { deliveryContext, threadId };
 }
